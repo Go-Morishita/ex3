@@ -6,6 +6,13 @@
 //  Copyright © 2019 Yonghao Yue. All rights reserved.
 //
 
+/*
+* 青山学院大学 理工学部情報テクノロジー学科
+* デジタルメディア設計演習第3回演習課題1
+* 共同制作 森下剛・堀田大智・中江朋弘
+* 解答:関数drawTessellatedShadedSquare()の中でdrawShadedSquare_ex3()をfor文で呼び出すことで実現
+*/
+
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #define EIGEN_DONT_VECTORIZE
 
@@ -35,25 +42,49 @@ Camera g_Camera;
 
 
 Eigen::Vector3d g_PointLightPos{ 0.0, 3.0, 3.0 };
-double g_LightIntensity = 20.0;
+double g_LightIntensity = 30.0;
 
 
-/*
 void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
-    // X-
-    drawShadedSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd);
-    // X+
-    drawShadedSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd);
-    // Y-
-    drawShadedSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd);
-    // Y+
-    drawShadedSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd);
-    // Z-
-    drawShadedSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd);
-    // Z+
-    drawShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd);
+    
 }
-*/
+
+void drawShadedSquare_ex3(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
+{
+    const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
+    const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
+    const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
+    const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
+
+    Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
+    n.normalize();
+
+    Eigen::Vector3d L = g_PointLightPos - in_center;
+    const double dist = L.norm();
+    L.normalize();
+    const double cos_theta = std::max<double>(0.0, L.dot(n));
+
+
+    const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
+
+    glBegin(GL_TRIANGLES);
+
+    glColor3f(L_o.x(), L_o.y(), L_o.z());
+
+    glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
+    glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+    glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+
+    glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+    glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+    glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
+
+    glEnd();
+}
+
+
+
+/*以下の行は変更しないこと*/
 
 
 
@@ -143,7 +174,6 @@ void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_a
     // Z+
     drawShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd);
 }
-
 
 void idle()
 {
