@@ -44,17 +44,11 @@ Camera g_Camera;
 Eigen::Vector3d g_PointLightPos{ 0.0, 3.0, 3.0 };
 double g_LightIntensity = 30.0;
 
-
-void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
-    
-}
-
-void drawShadedSquare_ex3(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
-{
-    const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
-    const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
-    const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
-    const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
+void drawShadedSquare_ex3(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd) {
+    const Eigen::Vector3d p_xmym = (in_center - in_arm_u - in_arm_v);
+    const Eigen::Vector3d p_xpym = (in_center + in_arm_u - in_arm_v);
+    const Eigen::Vector3d p_xmyp = (in_center - in_arm_u + in_arm_v);
+    const Eigen::Vector3d p_xpyp = (in_center + in_arm_u + in_arm_v);
 
     Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
     n.normalize();
@@ -82,12 +76,36 @@ void drawShadedSquare_ex3(const Eigen::Vector3d& in_center, const Eigen::Vector3
     glEnd();
 }
 
+void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
+    int i, j;
 
+    for (i = 0; i < in_nSegs; i++) {
+        for (j = 0; j < in_nSegs; j++) {
+            drawShadedSquare_ex3(in_center - in_arm_u - in_arm_v + (2 * j + 1) * in_arm_u / in_nSegs + (2 * i + 1) * in_arm_v / in_nSegs, in_arm_u / in_nSegs, in_arm_v / in_nSegs, in_kd);
+        }
+    }
+}
+
+void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd, const int in_nSegs)
+{
+    // X-
+    drawTessellatedShadedSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd, in_nSegs);
+    // X+
+    drawTessellatedShadedSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd, in_nSegs);
+    // Y-
+    drawTessellatedShadedSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd, in_nSegs);
+    // Y+
+    drawTessellatedShadedSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd, in_nSegs);
+    // Z-
+    drawTessellatedShadedSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd, in_nSegs);
+    // Z+
+    drawTessellatedShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd, in_nSegs);
+}
 
 /*以下の行は変更しないこと*/
 
 
-
+/*
 void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
 {
     const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
@@ -120,7 +138,9 @@ void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& i
 
     glEnd();
 }
+*/
 
+/*
 void drawSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_color)
 {
     glBegin(GL_TRIANGLES);
@@ -142,7 +162,9 @@ void drawSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_
 
     glEnd();
 }
+*/
 
+/*
 void drawBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_color)
 {
     // X-
@@ -158,22 +180,7 @@ void drawBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, 
     // Z+
     drawSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_color);
 }
-
-void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd)
-{
-    // X-
-    drawShadedSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd);
-    // X+
-    drawShadedSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd);
-    // Y-
-    drawShadedSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd);
-    // Y+
-    drawShadedSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd);
-    // Z-
-    drawShadedSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd);
-    // Z+
-    drawShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd);
-}
+*/
 
 void idle()
 {
@@ -278,11 +285,11 @@ void display()
   
   drawFloor();
 
-  drawShadedBox({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 });
-  drawShadedBox({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 });
+  drawShadedBox({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 }, 50);
+  drawShadedBox({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 }, 50);
 
-  //drawTessellatedShadedSquare({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 });
-  //drawTessellatedShadedSquare({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 });
+  //drawTessellatedShadedSquare({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 }, 5);
+  //drawTessellatedShadedSquare({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, 5);
 
 
   //drawBox({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 });
