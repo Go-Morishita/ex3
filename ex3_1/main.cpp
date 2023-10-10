@@ -10,7 +10,8 @@
 * 青山学院大学 理工学部情報テクノロジー学科
 * デジタルメディア設計演習第3回演習課題1
 * 共同制作 森下剛・堀田大智・中江朋弘
-* 解答:関数drawTessellatedShadedSquare()の中でdrawShadedSquare_ex3()をfor文で呼び出すことで実現
+* アルゴリズム:　drawShadedBox()の中で面ごとにdrawTessellatedShadedSquare()を呼び出し、drawTessellatedShadedSquare()の中で、drawShadedSquare()を複数回呼び出して、実装
+* 
 */
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -44,28 +45,41 @@ Camera g_Camera;
 Eigen::Vector3d g_PointLightPos{ 0.0, 3.0, 3.0 };
 double g_LightIntensity = 20.0;
 
-void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd);
+void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
+{
+	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
+	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
+	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
+	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
 
-void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs);
+	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
+	n.normalize();
 
-void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd);
+	Eigen::Vector3d L = g_PointLightPos - in_center;
+	const double dist = L.norm();
+	L.normalize();
+	const double cos_theta = std::max<double>(0.0, L.dot(n));
 
-void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd) {
-	// X-
-	drawTessellatedShadedSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd, 20);
-	// X+
-	drawTessellatedShadedSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd, 20);
-	// Y-
-	drawTessellatedShadedSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd, 20);
-	// Y+
-	drawTessellatedShadedSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd, 20);
-	// Z-
-	drawTessellatedShadedSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd, 20);
-	// Z+
-	drawTessellatedShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd, 20);
+
+	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
+
+	glBegin(GL_TRIANGLES);
+
+	glColor3f(L_o.x(), L_o.y(), L_o.z());
+
+	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
+	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+
+	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
+
+	glEnd();
 }
 
-void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
+//森下剛　作成
+void drawTessellatedShadedSquare_Morishita(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
 
 	for (int i = 0; i < in_nSegs ; i++) {
 		for (int j = 0; j < in_nSegs ; j++) {
@@ -79,135 +93,51 @@ void drawTessellatedShadedSquare(const Eigen::Vector3d& in_center, const Eigen::
 	}
 }
 
-
-void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
-{
-	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
-	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
-
-	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
-	n.normalize();
-
-	Eigen::Vector3d L = g_PointLightPos - in_center;
-	const double dist = L.norm();
-	L.normalize();
-	const double cos_theta = std::max<double>(0.0, L.dot(n));
-
-
-	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
-
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(L_o.x(), L_o.y(), L_o.z());
-
-	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
-
-	glEnd();
+void drawShadedBox_Morishita(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd, const int in_nSegs) {
+	// X-
+	drawTessellatedShadedSquare_Morishita(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd, in_nSegs);
+	// X+
+	drawTessellatedShadedSquare_Morishita(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd, in_nSegs);
+	// Y-
+	drawTessellatedShadedSquare_Morishita(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd, in_nSegs);
+	// Y+
+	drawTessellatedShadedSquare_Morishita(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd, in_nSegs);
+	// Z-
+	drawTessellatedShadedSquare_Morishita(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd, in_nSegs);
+	// Z+
+	drawTessellatedShadedSquare_Morishita(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd, in_nSegs);
 }
 
+//堀田大智　作成
+void drawTessellatedShadedSquare_Hotta(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd, const int in_nSegs) {
+	int i, j;
 
-
-/*以下の行は変更しないこと*/
-
-
-/*
-void drawShadedSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_kd)
-{
-	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
-	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
-
-	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
-	n.normalize();
-
-	Eigen::Vector3d L = g_PointLightPos - in_center;
-	const double dist = L.norm();
-	L.normalize();
-	const double cos_theta = std::max<double>(0.0, L.dot(n));
-
-
-	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
-
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(L_o.x(), L_o.y(), L_o.z());
-
-	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
-
-	glEnd();
+	for (i = 0; i < in_nSegs; i++) {
+		for (j = 0; j < in_nSegs; j++) {
+			drawShadedSquare(in_center - in_arm_u - in_arm_v + (2 * j + 1) * in_arm_u / in_nSegs + (2 * i + 1) * in_arm_v / in_nSegs, in_arm_u / in_nSegs, in_arm_v / in_nSegs, in_kd);
+		}
+	}
 }
 
-
-void drawSquare(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_color)
-{
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(in_color.x(), in_color.y(), in_color.z());
-
-	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
-	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
-
-	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
-
-	glEnd();
-}
-
-void drawBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_color)
+void drawShadedBox_Hotta(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd, const int in_nSegs)
 {
 	// X-
-	drawSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd, in_nSegs);
 	// X+
-	drawSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd, in_nSegs);
 	// Y-
-	drawSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd, in_nSegs);
 	// Y+
-	drawSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd, in_nSegs);
 	// Z-
-	drawSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd, in_nSegs);
 	// Z+
-	drawSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_color);
+	drawTessellatedShadedSquare_Hotta(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd, in_nSegs);
 }
 
-/*
-void drawShadedBox(const Eigen::Vector3d& in_center, const Eigen::Vector3d& in_arm_u, const Eigen::Vector3d& in_arm_v, const Eigen::Vector3d& in_arm_w, const Eigen::Vector3d& in_kd)
-{
-	// X-
-	drawShadedSquare(in_center - in_arm_u, -in_arm_v, in_arm_w, in_kd);
-	// X+
-	drawShadedSquare(in_center + in_arm_u, in_arm_v, in_arm_w, in_kd);
-	// Y-
-	drawShadedSquare(in_center - in_arm_v, in_arm_u, in_arm_w, in_kd);
-	// Y+
-	drawShadedSquare(in_center + in_arm_v, -in_arm_u, in_arm_w, in_kd);
-	// Z-
-	drawShadedSquare(in_center - in_arm_w, -in_arm_u, in_arm_v, in_kd);
-	// Z+
-	drawShadedSquare(in_center + in_arm_w, in_arm_u, in_arm_v, in_kd);
-}
-*/
+
+
+
 
 void idle()
 {
@@ -259,37 +189,6 @@ void drawFloor()
 	glEnd();
 }
 
-//*
-void drawSphereHint()
-{
-	glBegin(GL_TRIANGLES);
-	const double t1 = M_PI * 0.5 * 30.0 / 90.0;
-	const double t2 = M_PI * 0.5 * 45.0 / 90.0;
-	const double r = 0.8;
-	int N = 36;
-	for (int i = 0; i < N; i++)
-	{
-		const double p1 = 2.0 * M_PI * double(i) / double(N);
-		const double p2 = 2.0 * M_PI * double(i + 1) / double(N);
-
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p1), r * cosf(t1), r * sinf(t1) * sinf(p1));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p2), r * cosf(t1), r * sinf(t1) * sinf(p2));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p1), r * cosf(t2), r * sinf(t2) * sinf(p1));
-
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p2), r * cosf(t1), r * sinf(t1) * sinf(p2));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p1), r * cosf(t2), r * sinf(t2) * sinf(p1));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p2), r * cosf(t2), r * sinf(t2) * sinf(p2));
-	}
-	glEnd();
-}
-//*/
-
 void display()
 {
 	glViewport(0, 0, width * g_FrameSize_WindowSize_Scale_x, height * g_FrameSize_WindowSize_Scale_y);
@@ -312,16 +211,8 @@ void display()
 
 	drawFloor();
 
-	drawShadedBox({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 });
-	drawShadedBox({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 });
-
-
-	//drawBox({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 });
-	//drawBox({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 });
-
-	//drawSquare({ 0.0, 0.2, 0.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.8, 0.5 });
-
-	//drawSphereHint();
+	drawShadedBox_Morishita({ 0.7, 0.3, -0.2 }, { 0.3, 0.0, 0.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 0.0, 0.5 }, { 1.0, 0.8, 0.5 }, 100);
+	drawShadedBox_Hotta({ -0.7, 0.2, -0.2 }, { 0.4, 0.0, 0.0 }, { 0.0, 0.2, 0.0 }, { 0.0, 0.0, 0.4 }, { 0.5, 0.8, 1.0 }, 100);
 
 	glutSwapBuffers();
 }
