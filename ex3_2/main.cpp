@@ -97,9 +97,19 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 		v3[k][1] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * cos(keido[k] + 3.1415 / in_nSegs);
 		v3[k][2] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * sin(keido[k] + 3.1415 / in_nSegs);
 		v3[k][3] = in_r * cos(ido[k] + 3.1415 / in_nSegs);
-	}
 
+		Eigen::Vector3d in_p1{ v[k][1], v[k][3], v[k][2] };		//点v の位置ベクトル
+		Eigen::Vector3d in_p2{ v2[k][1], v2[k][3], v2[k][2] };	//点v2 の位置ベクトル
+		//Eigen::Vector3d in_p2S{ 0.0, 3.0, 3.0 };	//点v1 の位置ベクトル
+		Eigen::Vector3d in_p3{ v3[k][1], v3[k][3], v3[k][2] };		//点v3 の位置ベクトル
+
+		drawShadedTriangle(in_p1, in_p2, in_p3, in_kd);
+
+	}
+		
+	/*
 	for (l = 0; l < c + 1; l++) {
+
 		//v, v2, v3からなる三角形
 		glBegin(GL_TRIANGLES);
 		glColor3f(0.4, 0.9, 0.4);
@@ -116,9 +126,10 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 		glVertex3f(v3[l][1], v3[l][3], v3[l][2]);
 		glEnd();
 	}
+	*/
 }
 
-void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
+void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
 	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
 	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
 	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
