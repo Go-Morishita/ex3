@@ -45,14 +45,14 @@ int mx, my;
 
 Camera g_Camera;
 
-#define MAX 6000
+#define MAX 40000
 
-Eigen::Vector3d g_PointLightPos{ 0.0, 3.0, 3.0 };
-double g_LightIntensity = 30.0;
+Eigen::Vector3d g_PointLightPos{ 2.0, 2.5, 2.0 };
+double g_LightIntensity = 38.0;
 
 void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
 	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
-	const Eigen::Vector3d in_arm_u = (in_p3 - in_p1) / 2;
+	const Eigen::Vector3d in_arm_u = (in_p3 - in_p2) / 2;
 	const Eigen::Vector3d in_arm_v = (in_p2 - in_p1) / 2;
 
 	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
@@ -139,31 +139,7 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 		drawShadedTriangle(in_p1 + in_c, in_p2 + in_c, in_p3 + in_c, in_kd);
 
 	}
-
-	/*
-	for (l = 0; l < c + 1; l++) {
-
-		//v, v2, v3からなる三角形
-		glBegin(GL_TRIANGLES);
-		glColor3f(0.4, 0.9, 0.4);
-		glVertex3f(v[l][1], v[l][3], v[l][2]);
-		glVertex3f(v2[l][1], v2[l][3], v2[l][2]);
-		glVertex3f(v3[l][1], v3[l][3], v3[l][2]);
-		glEnd();
-
-		//v, v1, v3からなる三角形
-		glBegin(GL_TRIANGLES);
-		glColor3f(0.4, 0.9, 0.4);
-		glVertex3f(v[l][1], v[l][3], v[l][2]);
-		glVertex3f(v1[l][1], v1[l][3], v1[l][2]);
-		glVertex3f(v3[l][1], v3[l][3], v3[l][2]);
-		glEnd();
-	}
-	*/
 }
-
-
-/*以下の行は変更しないこと*/
 
 void idle()
 {
@@ -215,36 +191,6 @@ void drawFloor()
 	glEnd();
 }
 
-//*
-void drawSphereHint()
-{
-	glBegin(GL_TRIANGLES);
-	const double t1 = M_PI * 0.5 * 30.0 / 90.0;
-	const double t2 = M_PI * 0.5 * 45.0 / 90.0;
-	const double r = 0.8;
-	int N = 36;
-	for (int i = 0; i < N; i++)
-	{
-		const double p1 = 2.0 * M_PI * double(i) / double(N);
-		const double p2 = 2.0 * M_PI * double(i + 1) / double(N);
-
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p1), r * cosf(t1), r * sinf(t1) * sinf(p1));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p2), r * cosf(t1), r * sinf(t1) * sinf(p2));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p1), r * cosf(t2), r * sinf(t2) * sinf(p1));
-
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t1) * cosf(p2), r * cosf(t1), r * sinf(t1) * sinf(p2));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p1), r * cosf(t2), r * sinf(t2) * sinf(p1));
-		glColor3f(0.5, 0.5 + 0.5 * sin(2.0 * M_PI * double(i) / double(N)), 0.3);
-		glVertex3f(r * sinf(t2) * cosf(p2), r * cosf(t2), r * sinf(t2) * sinf(p2));
-	}
-	glEnd();
-}
-//*/
 
 void display()
 {
@@ -268,7 +214,7 @@ void display()
 
 	drawFloor();
 
-	drawShadedSphere({ 1.0, 1.0, 1.0 }, 1.0, 48, { 0.0, 0.0, 0.5 });
+	drawShadedSphere({ 0, 0.5, 0 }, 0.5, 140, { 0.3, 0.27, 0.15 });
 
 	glutSwapBuffers();
 }
