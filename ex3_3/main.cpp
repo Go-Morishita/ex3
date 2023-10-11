@@ -86,7 +86,7 @@ void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_
 	glEnd();
 }
 
-void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd) {
+void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	double R = 1.5; // 0で球
 
 	int M = 100;
@@ -119,13 +119,13 @@ void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const i
 			Eigen::Vector3d in_p2{x2, z2, y2};
 			Eigen::Vector3d in_p3{x3, z3, y3 };
 
-			drawShadedTriangle(in_p1, in_p2, in_p3, in_kd);
+			drawShadedTriangle(in_p1, in_p2, in_p3, in_kd_Blue, in_kd_Yellow);
 
 		}
 	}
 }
 
-void drawShadedSphere_2(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd) {
+void drawShadedSphere_2(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	double R = 7;
 
 	int M = 100;
@@ -159,7 +159,7 @@ void drawShadedSphere_2(const Eigen::Vector3d& in_c, const double& in_r, const i
 			Eigen::Vector3d in_p2{ x2, y2, z2 };
 			Eigen::Vector3d in_p3{ x3, y3, z3 };
 
-			drawShadedTriangle(in_p1, in_p2, in_p3, in_kd);
+			drawShadedTriangle(in_p1, in_p2, in_p3, in_kd_Blue, in_kd_Yellow);
 
 		}
 
@@ -239,9 +239,9 @@ void display()
 
 	drawFloor();
 
-	drawShadedSphere_1({ 0, 0.5, 0 }, 0.5, 140, { 0.3, 0.27, 0.15 });
+	drawShadedSphere_1({ 0, 0.5, 0 }, 0.5, 140, { 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
 
-	drawShadedSphere_2({ 0, 0.5, 0 }, 0.5, 140, { 0.3, 0.27, 0.15 });
+	drawShadedSphere_2({ 0, 0.5, 0 }, 0.5, 140, { 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
 
 	glutSwapBuffers();
 }
