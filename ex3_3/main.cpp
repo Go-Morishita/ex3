@@ -47,14 +47,11 @@ Camera g_Camera;
 
 #define MAX 40000
 
-Eigen::Vector3d g_PointLightPos{ 2.0, 2.5, 2.0 };
-double g_LightIntensity = 38.0;
-
 Eigen::Vector3d g_PointLightPos_Blue{ 2.0, 7.0, 2.0 };
 double g_LightIntensity_Blue = 38.0;
 
-Eigen::Vector3d g_PointLightPos_Yellow{ 0, 0, 0 };
-double g_LightIntensity_Yellow = 38.0;
+Eigen::Vector3d g_PointLightPos_Yellow{ 2.0, 0.5, 2.0 };
+double g_LightIntensity_Yellow = 37.0;
 
 void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
@@ -108,8 +105,8 @@ void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_
 void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	double R = 1.5; // 0で球
 
-	int M = 100;
-	int S = 100;
+	int M = 500;
+	int S = 500;
 	double radius4 = 0.4;
 
 	const double angleS = 2 * M_PI / S;
@@ -138,7 +135,7 @@ void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const i
 			Eigen::Vector3d in_p2{x2, z2, y2};
 			Eigen::Vector3d in_p3{x3, z3, y3 };
 
-			drawShadedTriangle(in_p1, in_p2, in_p3, in_kd_Blue, in_kd_Yellow);
+			drawShadedTriangle(in_p2, in_p1, in_p3, in_kd_Blue, in_kd_Yellow);
 
 		}
 	}
@@ -147,8 +144,8 @@ void drawShadedSphere_1(const Eigen::Vector3d& in_c, const double& in_r, const i
 void drawShadedSphere_2(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	double R = 7;
 
-	int M = 100;
-	int S = 100;
+	int M = 500;
+	int S = 500;
 	double radius4 = 0.4;
 
 	const double angleS = 2 * M_PI / S;
@@ -185,6 +182,61 @@ void drawShadedSphere_2(const Eigen::Vector3d& in_c, const double& in_r, const i
 	}
 }
 
+void drawShadedSphere_3(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
+	int i, j, k, l;
+	int c = 0;
+	double ido[MAX], keido[MAX];
+	double v[MAX][3], v1[MAX][3], v2[MAX][3], v3[MAX][3];
+
+	//それぞれの角度を定める(θ:緯度(ido)、Φ:経度(keido))
+	for (i = 0; i < in_nSegs + 1; i++) {
+		for (j = 0; j < in_nSegs * 2; j++) {
+			ido[c] = i * 3.1415 / in_nSegs;
+			keido[c] = j * 3.1415 / in_nSegs;
+
+			if (ido[c] >= 3.1415) {
+				ido[c] = 3.14159265;
+			}
+
+			if (keido[c] >= 6.283) {
+				keido[c] = 0.0;
+
+			}
+			c++;
+		}
+	}
+
+	for (k = 0; k < c + 1; k++) {
+		//現在の点
+		v[k][1] = in_r * sin(ido[k]) * cos(keido[k]);
+		v[k][2] = in_r * sin(ido[k]) * sin(keido[k]);
+		v[k][3] = in_r * cos(ido[k]);
+
+		//次の経度(keido + 1)の点
+		v1[k][1] = in_r * sin(ido[k]) * cos(keido[k] + 3.1415 / in_nSegs);
+		v1[k][2] = in_r * sin(ido[k]) * sin(keido[k] + 3.1415 / in_nSegs);
+		v1[k][3] = in_r * cos(ido[k]);
+
+		//次の緯度(ido + 1)の点
+		v2[k][1] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * cos(keido[k]);
+		v2[k][2] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * sin(keido[k]);
+		v2[k][3] = in_r * cos(ido[k] + 3.1415 / in_nSegs);
+
+		//次の緯度(ido + 1)、経度(keido + 1)の点
+		v3[k][1] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * cos(keido[k] + 3.1415 / in_nSegs);
+		v3[k][2] = in_r * sin(ido[k] + 3.1415 / in_nSegs) * sin(keido[k] + 3.1415 / in_nSegs);
+		v3[k][3] = in_r * cos(ido[k] + 3.1415 / in_nSegs);
+
+		Eigen::Vector3d in_p1{ v[k][1], v[k][3], v[k][2] };		//点v の位置ベクトル
+		Eigen::Vector3d in_p2{ v2[k][1], v2[k][3], v2[k][2] };	//点v2 の位置ベクトル
+		//Eigen::Vector3d in_p2S{ 0.0, 3.0, 3.0 };	//点v1 の位置ベクトル
+		Eigen::Vector3d in_p3{ v3[k][1], v3[k][3], v3[k][2] };		//点v3 の位置ベクトル
+
+		drawShadedTriangle(in_p2 + in_c, in_p1 + in_c, in_p3 + in_c, in_kd_Blue, in_kd_Yellow);
+
+	}
+}
+
 void idle()
 {
 #ifdef __APPLE__
@@ -210,16 +262,17 @@ void projection_and_modelview(const Camera& in_Camera)
 	gluLookAt(in_Camera.getEyePoint().x(), in_Camera.getEyePoint().y(), in_Camera.getEyePoint().z(), lookAtPoint.x(), lookAtPoint.y(), lookAtPoint.z(), in_Camera.getYVector().x(), in_Camera.getYVector().y(), in_Camera.getYVector().z());
 }
 
-void drawFloor()
+void drawFloor(const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow)
 {
 	glBegin(GL_TRIANGLES);
-	for (int j = -20; j < 20; j++)
+	for (int j = -100; j < 100; j++)
 	{
-		for (int i = -20; i < 20; i++)
+		for (int i = -100; i < 100; i++)
 		{
 			int checker_bw = (i + j) % 2;
 			if (checker_bw == 0)
 			{
+				/*
 				glColor3f(0.3, 0.3, 0.3);
 
 				glVertex3f(i * 0.5, 0.0, j * 0.5);
@@ -229,6 +282,13 @@ void drawFloor()
 				glVertex3f(i * 0.5, 0.0, (j + 1) * 0.5);
 				glVertex3f((i + 1) * 0.5, 0.0, (j + 1) * 0.5);
 				glVertex3f((i + 1) * 0.5, 0.0, j * 0.5);
+				*/
+
+				Eigen::Vector3d in_p1{ i * 0.1, 0.0, j * 0.1 };
+				Eigen::Vector3d in_p2{ i * 0.1, 0.0, (j + 1) * 0.1 };
+				Eigen::Vector3d in_p3{ (i + 1) * 0.1, 0.0, j * 0.1 };
+
+				drawShadedTriangle(in_p2, in_p1, in_p3, in_kd_Blue, in_kd_Yellow);
 			}
 		}
 	}
@@ -256,11 +316,13 @@ void display()
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-	drawFloor();
+	drawFloor({ 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
 
 	drawShadedSphere_1({ 0, 0.5, 0 }, 0.5, 140, { 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
 
 	drawShadedSphere_2({ 0, 0.5, 0 }, 0.5, 140, { 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
+
+	drawShadedSphere_3({ 2.0, 0.5, 2.0 }, 0.2, 140, { 0.1, 0.1, 0.5 }, { 0.4, 0.4, 0.1 });
 
 	glutSwapBuffers();
 }
