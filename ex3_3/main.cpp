@@ -47,10 +47,13 @@ Camera g_Camera;
 
 #define MAX 40000
 
-Eigen::Vector3d g_PointLightPos{ 2.0, 2.5, 2.0 };
-double g_LightIntensity = 38.0;
+Eigen::Vector3d g_PointLightPos_Blue{ 2.0, 7.0, 2.0 };
+double g_LightIntensity_Blue = 38.0;
 
-void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
+Eigen::Vector3d g_PointLightPos_Yellow{ 0, 0, 0 };
+double g_LightIntensity_Yellow = 38.0;
+
+void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
 	const Eigen::Vector3d in_arm_u = (in_p3 - in_p2) / 2;
 	const Eigen::Vector3d in_arm_v = (in_p2 - in_p1) / 2;
@@ -63,13 +66,26 @@ void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_
 	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
 	n.normalize();
 
-	Eigen::Vector3d L = g_PointLightPos - in_center;
-	const double dist = L.norm();
-	L.normalize();
-	const double cos_theta = std::max<double>(0.0, L.dot(n));
+	//青の光源について
+	Eigen::Vector3d L_Blue = g_PointLightPos_Blue - in_center;
+	const double dist_Blue = L_Blue.norm();
+	L_Blue.normalize();
+	const double cos_theta_Blue = std::max<double>(0.0, L_Blue.dot(n));
 
 
-	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
+	const Eigen::Vector3d L_o_Blue = in_kd_Blue * g_LightIntensity_Blue * cos_theta_Blue / (dist_Blue * dist_Blue);
+
+	//黄色の光源について
+	Eigen::Vector3d L_Yellow = g_PointLightPos_Yellow - in_center;
+	const double dist_Yellow = L_Yellow.norm();
+	L_Yellow.normalize();
+	const double cos_theta_Yellow = std::max<double>(0.0, L_Yellow.dot(n));
+
+
+	const Eigen::Vector3d L_o_Yellow = in_kd_Yellow * g_LightIntensity_Yellow * cos_theta_Yellow / (dist_Yellow * dist_Yellow);
+
+	//観測される輝度:青、黄色の和
+	const Eigen::Vector3d L_o = L_o_Blue + L_o_Yellow;
 
 	glBegin(GL_TRIANGLES);
 
@@ -86,7 +102,7 @@ void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_
 	glEnd();
 }
 
-void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd) {
+void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	int i, j, k, l;
 	int c = 0;
 	double ido[MAX], keido[MAX];
