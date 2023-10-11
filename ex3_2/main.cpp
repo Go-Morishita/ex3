@@ -118,7 +118,11 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 	}
 }
 
-void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
+void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
+	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
+	const Eigen::Vector3d in_arm_u = (in_p3 - in_p1) / 2;
+	const Eigen::Vector3d in_arm_v = (in_p2 - in_p1) / 2;
+
 	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
 	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
 	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
