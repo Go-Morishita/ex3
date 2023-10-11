@@ -50,7 +50,41 @@ Camera g_Camera;
 Eigen::Vector3d g_PointLightPos{ 0.0, 3.0, 3.0 };
 double g_LightIntensity = 30.0;
 
-void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd);
+void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
+	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
+	const Eigen::Vector3d in_arm_u = (in_p3 - in_p1) / 2;
+	const Eigen::Vector3d in_arm_v = (in_p2 - in_p1) / 2;
+
+	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
+	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
+	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
+	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
+
+	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
+	n.normalize();
+
+	Eigen::Vector3d L = g_PointLightPos - in_center;
+	const double dist = L.norm();
+	L.normalize();
+	const double cos_theta = std::max<double>(0.0, L.dot(n));
+
+
+	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
+
+	glBegin(GL_TRIANGLES);
+
+	glColor3f(L_o.x(), L_o.y(), L_o.z());
+
+	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
+	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+
+	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
+	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
+	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
+
+	glEnd();
+}
 
 void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd) {
 	int i, j, k, l;
@@ -127,42 +161,6 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 		glEnd();
 	}
 	*/
-}
-
-void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd) {
-	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
-	const Eigen::Vector3d in_arm_u = (in_p3 - in_p1) / 2;
-	const Eigen::Vector3d in_arm_v = (in_p2 - in_p1) / 2;
-
-	const Eigen::Vector3d p_xmym = in_center - in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xpym = in_center + in_arm_u - in_arm_v;
-	const Eigen::Vector3d p_xmyp = in_center - in_arm_u + in_arm_v;
-	const Eigen::Vector3d p_xpyp = in_center + in_arm_u + in_arm_v;
-
-	Eigen::Vector3d n = in_arm_u.cross(in_arm_v);
-	n.normalize();
-
-	Eigen::Vector3d L = g_PointLightPos - in_center;
-	const double dist = L.norm();
-	L.normalize();
-	const double cos_theta = std::max<double>(0.0, L.dot(n));
-
-
-	const Eigen::Vector3d L_o = in_kd * g_LightIntensity * cos_theta / (dist * dist);
-
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(L_o.x(), L_o.y(), L_o.z());
-
-	glVertex3f(p_xmym.x(), p_xmym.y(), p_xmym.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-
-	glVertex3f(p_xmyp.x(), p_xmyp.y(), p_xmyp.z());
-	glVertex3f(p_xpym.x(), p_xpym.y(), p_xpym.z());
-	glVertex3f(p_xpyp.x(), p_xpyp.y(), p_xpyp.z());
-
-	glEnd();
 }
 
 
