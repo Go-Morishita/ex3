@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\CGProgramming\freeglut-2.8.1\include;C:\CGProgramming\eigen-3.4.0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CGProgramming\freeglut-2.8.1\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CGPrograming\freeglut-2.8.1\include;C:\CGPrograming\eigen-3.4.0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CGPrograming\freeglut-2.8.1\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
