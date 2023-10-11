@@ -88,7 +88,6 @@ void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_
 
 void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int in_nSegs, const Eigen::Vector3d& in_kd) {
 	int i, j, k, l;
-	double r = 1.0;
 	int c = 0;
 	double ido[MAX], keido[MAX];
 	double v[MAX][3], v1[MAX][3], v2[MAX][3], v3[MAX][3];
@@ -137,7 +136,7 @@ void drawShadedSphere(const Eigen::Vector3d& in_c, const double& in_r, const int
 		//Eigen::Vector3d in_p2S{ 0.0, 3.0, 3.0 };	//点v1 の位置ベクトル
 		Eigen::Vector3d in_p3{ v3[k][1], v3[k][3], v3[k][2] };		//点v3 の位置ベクトル
 
-		drawShadedTriangle(in_p1, in_p2, in_p3, in_kd);
+		drawShadedTriangle(in_p1 + in_c, in_p2 + in_c, in_p3 + in_c, in_kd);
 
 	}
 
