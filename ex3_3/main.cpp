@@ -51,7 +51,7 @@ Eigen::Vector3d g_PointLightPos_Blue{ 2.0, 7.0, 2.0 };
 double g_LightIntensity_Blue = 38.0;
 
 Eigen::Vector3d g_PointLightPos_Yellow{ 2.0, 0.5, 2.0 };
-double g_LightIntensity_Yellow = 37.0;
+double g_LightIntensity_Yellow = 15.0;
 
 void drawShadedTriangle(const Eigen::Vector3d& in_p1, const Eigen::Vector3d& in_p2, const Eigen::Vector3d& in_p3, const Eigen::Vector3d& in_kd_Blue, const Eigen::Vector3d& in_kd_Yellow) {
 	const Eigen::Vector3d in_center = (in_p1 + in_p3) / 2;
