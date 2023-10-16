@@ -10,8 +10,7 @@
 * 青山学院大学 理工学部情報テクノロジー学科
 * デジタルメディア設計演習第3回演習課題1
 * 共同制作 森下剛・堀田大智・中江朋弘
-* アルゴリズム:　drawShadedBox()の中で面ごとにdrawTessellatedShadedSquare()を呼び出し、drawTessellatedShadedSquare()の中で、drawShadedSquare()を複数回呼び出して、実装
-* 
+* アルゴリズム:　drawShadedBox()の中で面ごとにdrawTessellatedShadedSquare()を呼び出し、drawTessellatedShadedSquare()の中で、drawShadedSquare()を複数回呼び出して実装。
 */
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT

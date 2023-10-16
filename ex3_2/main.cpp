@@ -10,12 +10,8 @@
 * 青山学院大学 理工学部情報テクノロジー学科
 * デジタルメディア設計演習第3回演習課題2
 * 共同制作 森下剛・堀田大智・中江朋弘
-* 解答:
-*
-*
-*
-*
-*
+* アルゴリズム：drawShadedSphere()で、 drawShadedTriangle()を複数回呼び出して実装。 drawShadedSphere()内で球面の各ポリゴンの座標を計算しdrawShadedTriangle()に投げる。
+* drawShadedTriangle()は三点の座標から上手く各ベクトルを生成できるようにアップデートした。
 */
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT

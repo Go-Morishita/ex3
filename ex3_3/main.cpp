@@ -8,14 +8,8 @@
 
 /*
 * 青山学院大学 理工学部情報テクノロジー学科
-* デジタルメディア設計演習第3回演習課題2
+* デジタルメディア設計演習第3回演習課題3
 * 共同制作 森下剛・堀田大智・中江朋弘
-* 解答:
-*
-*
-*
-*
-*
 */
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -300,7 +294,7 @@ void display()
 {
 	glViewport(0, 0, width * g_FrameSize_WindowSize_Scale_x, height * g_FrameSize_WindowSize_Scale_y);
 
-	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glClearColor(0.1, 0.1, 0.5, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	projection_and_modelview(g_Camera);
